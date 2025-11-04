@@ -19,6 +19,51 @@
 19. Set action to take on high confidence spam detection [Scriptable]
 20. Set action to take on phishing detection [Scriptable]
 "
+
+# ======================== Secure Score Script Starter Block (User Context) =========================
+# This script checks for required modules, installs if missing (CurrentUser scope), and connects using web prompt.
+
+$modules = @(
+    @{Name="Microsoft.Graph"; MinimumVersion="1.20.0"},
+    @{Name="ExchangeOnlineManagement"; MinimumVersion="3.0.0"},
+    @{Name="AzureAD"; MinimumVersion="2.0.2.140"},
+    @{Name="MicrosoftTeams"; MinimumVersion="5.0.0"},
+    @{Name="Microsoft.Online.SharePoint.PowerShell"; MinimumVersion="16.0.22810.12000"}
+)
+foreach ($mod in $modules) {
+    if (-not (Get-Module -ListAvailable -Name $mod.Name)) {
+        Write-Host "Installing module $($mod.Name) for your user profile..." -ForegroundColor Cyan
+        Install-Module $mod.Name -MinimumVersion $mod.MinimumVersion -Scope CurrentUser -Force
+    }
+    Import-Module $mod.Name -MinimumVersion $mod.MinimumVersion -ErrorAction SilentlyContinue
+}
+
+# Connect to Microsoft Graph (Modern Auth)
+Write-Host "`nConnecting to Microsoft Graph (Modern Auth web prompt)..." -ForegroundColor Yellow
+Connect-MgGraph -Scopes "User.Read.All,Group.ReadWrite.All,Policy.ReadWrite.ConditionalAccess,Directory.ReadWrite.All,AuditLog.Read.All,IdentityRiskEvent.Read.All,Application.ReadWrite.All,RoleManagement.ReadWrite.Directory"
+
+# Connect to Exchange Online
+Write-Host "Connecting to Exchange Online (Modern Auth web prompt)..." -ForegroundColor Yellow
+Connect-ExchangeOnline
+
+# Connect to Azure AD
+Write-Host "Connecting to Azure AD (Modern Auth web prompt)..." -ForegroundColor Yellow
+Connect-AzureAD
+
+# Connect to Microsoft Teams
+Write-Host "Connecting to Microsoft Teams (Modern Auth web prompt)..." -ForegroundColor Yellow
+Connect-MicrosoftTeams
+
+# Connect to SharePoint Online (prompt for admin URL)
+$spAdminUrl = Read-Host "Enter your SharePoint Admin URL (e.g. https://contoso-admin.sharepoint.com)"
+Connect-SPOService -Url $spAdminUrl
+
+Write-Host "`nAll modules loaded and connections established! Ready to start checks..." -ForegroundColor Green
+# ====================== End Starter Block =========================
+
+
+
+
 # ====================== Secure Score Remediation Script - Batch 1 ======================
 
 # 1. Create Safe Links policies for email messages [Scriptable]
