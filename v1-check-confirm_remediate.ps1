@@ -21,7 +21,7 @@
 "
 
 # ======================== Secure Score Script Starter Block (User Context) =========================
-# This script checks for required modules, installs if missing (CurrentUser scope), and connects using web prompt.
+# This checks for required modules, installs if missing (CurrentUser scope), and connects using web prompt.
 
 $modules = @(
     @{Name="Microsoft.Graph"; MinimumVersion="1.20.0"},
@@ -60,11 +60,6 @@ Connect-SPOService -Url $spAdminUrl
 
 Write-Host "`nAll modules loaded and connections established! Ready to start checks..." -ForegroundColor Green
 # ====================== End Starter Block =========================
-
-
-
-
-# ====================== Secure Score Remediation Script - Batch 1 ======================
 
 # 1. Create Safe Links policies for email messages [Scriptable]
 Write-Host "`n1. Checking Safe Links policy for email messages..." -ForegroundColor Yellow
@@ -232,7 +227,6 @@ if ($antiPhishPolicy.EnableTargetedDomainsProtection -and $antiPhishPolicy.Targe
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 1 ======================
 
 # 11. Quarantine messages that are detected from impersonated users [Scriptable]
 Write-Host "`n11. Checking action for messages from impersonated users..." -ForegroundColor Yellow
@@ -387,7 +381,6 @@ if ($contentFilter.PhishSpamAction -eq "Quarantine") {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 2 ======================
 
 # 21. Ensure Safe Attachments policy is enabled [Scriptable]
 Write-Host "`n21. Checking Safe Attachments policy enabled..." -ForegroundColor Yellow
@@ -568,7 +561,6 @@ if ($spamPolicy.NotifyOutboundSpamRecipients -ne $null) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 3 ======================
 
 # 31. Create and deploy anti-malware policies for Exchange Online [Scriptable]
 Write-Host "`n31. Checking anti-malware policy for Exchange Online..." -ForegroundColor Yellow
@@ -741,7 +733,6 @@ if ($outlookPolicy -and !$outlookPolicy.AddinsEnabled) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 4 ======================
 # 41. Create zero-hour auto purge policies for phishing messages [Scriptable]
 Write-Host "`n41. Checking ZAP (zero-hour auto purge) for phishing messages..." -ForegroundColor Yellow
 $zapPhish = Get-HostedContentFilterPolicy | Where-Object { $_.ZapEnabled -eq $true }
@@ -896,7 +887,6 @@ if ($remoteDomain.AutoForwardEnabled -eq $false) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 5 ======================
 # 51. Set maximum number of external recipients that a user can email per hour [Scriptable]
 Write-Host "`n51. Checking maximum external recipient limit per hour..." -ForegroundColor Yellow
 $mailFlowConfig = Get-TransportConfig
@@ -1031,7 +1021,6 @@ if ($sspr.SelfServicePasswordResetPolicy.Enabled -eq "all") {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 6 ======================
 # 61. Ensure self-service group management is restricted [Scriptable]
 Write-Host "`n61. Checking self-service group management restriction..." -ForegroundColor Yellow
 $groupSettings = Get-MgDirectorySetting | Where-Object { $_.DisplayName -eq "Group.Unified" }
@@ -1191,7 +1180,6 @@ if ($alertPolicies | Where-Object { $_.Enabled -eq $true }) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 7 ======================
 # 71. Require multi-factor authentication registration for all users [Scriptable]
 Write-Host "`n71. Checking MFA registration for all users..." -ForegroundColor Yellow
 $mfaRegPolicy = Get-MgAuthenticationMethodPolicy -ErrorAction SilentlyContinue
@@ -1335,7 +1323,6 @@ if ($appRegPolicy.AllowUserConsentForAppRegistration -eq $false) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 8 ======================
 # 81. Ensure guest access is reviewed and restricted [Scriptable]
 Write-Host "`n81. Checking guest access review and restriction..." -ForegroundColor Yellow
 $guestPolicy = Get-MgPolicyExternalIdentitiesPolicy
@@ -1479,7 +1466,6 @@ if ($rolesWithoutOwners.Count -eq 0) {
 }
 Start-Sleep -Seconds 2
 
-# ====================== End of Batch 9 ======================
 # 91. Restrict creation of security groups to specific users [Scriptable]
 Write-Host "`n91. Checking if security group creation is restricted to specific users..." -ForegroundColor Yellow
 $groupSettings = Get-MgDirectorySetting | Where-Object { $_.DisplayName -eq "Group.Unified" }
@@ -1647,4 +1633,3 @@ if ($close -eq "Y") {
     Write-Host "Session remains open for further admin work." -ForegroundColor Yellow
 }
 
-# ====================== End of Final Batch ======================
